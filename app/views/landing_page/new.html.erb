@@ -1,0 +1,96 @@
+<!--nav class="navbar navbar-inverse navbar-static-top" style="background-color: white;"-->
+<script>
+  var dispatcher = new WebSocketRails(location.hostname+':3000/websocket');
+  var count=0;
+  var global_sent='';
+  dispatcher.on_open = function(data) {
+  console.log('Connection has been established: ', data);
+  // You can trigger new server events inside this callback if you wish.
+}
+  
+ dispatcher.bind('event_send_message', function(data) {
+   //alert(data);
+   
+   //alert(global_sent);
+   if(data!==global_sent) {
+  console.log(data); // would output 'this is a message'
+  console.log(count);
+  count=count+1;
+  document.getElementById("text_area").innerHTML+='<span id="add_here" style="font-weight:bold;color:red;">Stranger&nbsp;:&nbsp;</span>'+data+'<p></p>';
+ }
+  
+});
+
+function send_to_server() {
+
+
+var success = function(response) {
+  console.log("You are awesome because: "+response);
+}
+
+
+var failure = function(response) {
+  console.log("You are not very awesome because: "+response);
+}
+
+var j = $("#msg_area");
+  global_sent=j.val();
+    if (j.val().length > 0) {
+        console.log('Send request');
+      dispatcher.trigger('event_send_message', j.val(),success,failure); 
+    }
+
+
+}
+  function check_enter(t1his){
+  
+  if (t1his.value.charAt(t1his.value.length-1)=='\n')
+  {
+    send_to_server();
+  }
+  
+}
+
+</script>
+
+<script src="http://jqueryrotate.googlecode.com/svn/trunk/jQueryRotate.js"></script>
+<script>
+  $(function(){
+      $('#img1').rotate({animateTo: -360,duration:500});
+  });
+</script>
+<div class="container">
+  <div class="row" style="height:68px;">
+    <div class="col-xs-4" style="padding-left:0;">
+      <img id="img1" src="/images/final_chat.jpg" alt="Omega Symbol" style="margin-top:0;float:left;width:150px;">
+    </div>
+    <div class="col-xs-4">
+      <h3 style="text-align: left;"><b>Anonymous Chat Application</b></h3>
+    </div>
+    <div class="col-xs-4">
+      <h2 style="text-align:center;color: lightblue">24,000+ online now</h2>
+    </div>
+  </div>
+  <div class="row" style="padding-top:10px;padding-left:10px;margin-bottom:10px;height:520px;background-color: #eeeeee;border-radius: 6px;">
+    <div class="col-xs-12" style="height:100%;overflow-y: auto;overflow-x: hidden;">
+      <h3>You're now chatting with a random stranger. Say hi!</h3>
+      <h4 id="text_area"></h4>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-1" style="padding-left: 0px;">
+      <button onclick='stop_msg(this)' id="stop_btn" style="line-height:3.5; width:80px;" class="btn btn-info">Stop</button>
+    </div>
+    <div class="col-xs-11" style="padding-left: 0;padding-right: 0;">
+        <div class="col-xs-11">
+          <div class="form-group">
+                <textarea onkeyup="check_enter(this);GetChar(this)" name="user[user_input]" class="form-control" rows="2" id="msg_area"></textarea>
+          </div>
+        </div>
+        <div class="col-xs-1" style="padding-left:10px;">
+          <button  onclick="send_to_server();send_msg()" type="submit" id="send_btn" style="line-height:3.5; width:80px;" class="btn btn-info">Send</button>
+        </div>
+    </div>
+  </div>
+</div>
+<!--/nav>
